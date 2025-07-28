@@ -1,0 +1,152 @@
+# ===================================================================
+# KineticAugment Task-Specific Profile
+# Application: Sign Language Recognition (SLR) - Comprehensive Edition
+# ===================================================================
+#
+# Goal: To generate a wide variety of realistic training data by simulating
+# variations in signer style, environment, and camera properties, while
+# strictly preserving the linguistic integrity of signs.
+#
+# ===================================================================
+
+# --- Global Settings ---
+profile_name: "SignLanguageRecognition_Comprehensive_v1"
+
+# Defines the skeleton's structure. Crucial for any IK/FK systems.
+kinematic_chains:
+  - ["left_shoulder", "left_elbow", "left_wrist"]
+  - ["right_shoulder", "right_elbow", "right_wrist"]
+  - ["pelvis", "left_hip", "left_knee", "left_ankle"]
+  - ["pelvis", "right_hip", "right_knee", "right_ankle"]
+
+# Defines anatomical joint angle limits. Used by advanced augmentations
+# and the validation framework.
+joint_limits:
+  elbow: { min: 0.0, max: 2.6 }
+  shoulder_pitch: { min: -1.57, max: 3.14 }
+  shoulder_roll: { min: -1.57, max: 1.57 }
+  knee: { min: 0.0, max: 2.4 }
+
+# --- Augmentation Plan ---
+# A sequence of augmentation operations to be applied probabilistically.
+
+plan:
+  # --- 1. Extrinsic (Scene-Level) Augmentations ---
+  # These simulate changes in the camera or the signer's global position.
+  # They are applied in canonical space before de-canonicalization.
+
+  - operation: "GlobalRotation"
+    probability: 0.6
+    params:
+      max_angle_deg: { x: 3, y: 8, z: 3 } # Yaw up to 8deg, Pitch/Roll up to 3deg
+
+  - operation: "GlobalScaling"
+    probability: 0.5
+    params:
+      scale_range: [0.9, 1.1] # Simulate moving 10% closer/further
+
+  - operation: "GlobalTranslation"
+    probability: 0.4
+    params:
+      # Note: In canonical space, this shifts the skeleton off the origin.
+      # The effect is a slight shift in the final de-canonicalized position.
+      max_offset: { x: 0.05, y: 0.05, z: 0 } # Max 5% of shoulder_width offset
+
+  # --- 2. Intrinsic (Anatomy-Level) Augmentations ---
+  # These modify the pose and motion itself. They require the most care.
+
+  - operation: "PoseFlipping"
+    probability: 0.5 # Set to 0.5 to create a balanced dataset of original/flipped signs.
+    # Flips pose across the Y-Z plane and swaps left/right landmark labels.
+    # Extremely effective for data augmentation and mitigating dominant-hand bias.
+
+  - operation: "FacialExpressionJittering"
+    probability: 0.3
+    params:
+      # Adds subtle noise to facial landmarks to vary expressions.
+      # HIGH PRIORITY: This noise must be very small to avoid changing NMMs.
+      joint_group: "face"
+      amplitude: 0.002 # Very small positional noise
+      semantic_check: "preserve_grammatical_nmm" # Flag for the validation step
+
+  - operation: "PartialOcclusion"
+    probability: 0.25
+    params:
+      # Simulates real-world occlusion by setting landmarks to (0,0,0).
+      # Forces the model to be robust to missing data.
+      occlusion_type: "rectangle" # Can be 'rectangle' or 'joint_group'
+      # Example: Occlude a random 10% of the face landmarks
+      joint_group: "face"
+      occlusion_ratio: 0.1 # Percentage of landmarks in the group to occlude
+      duration_ratio: 0.3 # Occlude for 30% of the video's frames
+
+  # --- Placeholders for Advanced Kinematic Augmentations ---
+  - operation: "JointAnglePerturbation"
+    probability: 0.0 # Disabled until implemented
+    params:
+      # GOAL: Add noise to joint angles directly, then use FK to get new positions.
+      # This is the "correct" way to add pose noise.
+      joint_group: "arms"
+      noise_stddev_rad: 0.05
+
+  - operation: "JointCoupledNoise"
+    probability: 0.0 # Disabled until implemented
+    params:
+      # GOAL: An advanced version of the above, preserving finger coupling.
+      # The most important augmentation for handshapes.
+      joint_group: "fingers"
+      noise_stddev: 0.005
+      correlation_source: "anatomical_hand_dependencies"
+
+  # --- 3. Temporal Augmentations ---
+  # These manipulate the sequence along the time axis.
+
+  - operation: "TimeWarping"
+    probability: 0.6
+    params:
+      max_warp_factor: 0.2 # Allow up to 20% warp
+
+  - operation: "RateAlteration"
+    probability: 0.4
+    params:
+      # A simpler way to change speed uniformly.
+      rate_range: [0.85, 1.15] # 15% slower to 15% faster
+
+  - operation: "DynamicTrajectoryJittering"
+    probability: 0.5
+    params:
+      # Adds smooth noise to limb paths, simulating natural human tremor.
+      # A good proxy for adding noise before full IK/FK is available.
+      joint_group: "hands"
+      amplitude: 0.015 # Max deviation, relative to canonical scale
+      frequency: 0.1
+
+  - operation: "TemporalSmoothing"
+    probability: 0.2
+    params:
+      # Simulates motion blur or a low-frame-rate camera.
+      # Forces the model to learn macro-movements.
+      window_size: 3 # Size of the moving average filter (must be odd)
+
+  - operation: "MotionSlicing"
+    probability: 0.3
+    params:
+      # Randomly trims the start or end of the sequence.
+      # Simulates variations in recording start/stop times.
+      slice_ratio_range: [0.9, 1.0] # Keep between 90% and 100% of the original length
+
+# --- Validation Checks (Informational) ---
+# This section describes the checks that should be run by the Validation Framework
+# for any data augmented with this profile.
+
+validation_checks:
+  - check: "JointAngleLimits"
+    params: { joint_group: "all" }
+  - check: "LimbLengthStability"
+    params: { tolerance: 0.1 } # Allow 10% deviation in canonical space
+  - check: "HandshapeIntegrity"
+    # A crucial semantic check for SLR, using a simple classifier
+    params: { model_path: "models/handshape_validator.pth" }
+  - check: "GrammaticalNMMs"
+    # Checks if eyebrow/mouth markers are preserved if they existed in the original
+    params: { marker_type: "question_eyebrows" }

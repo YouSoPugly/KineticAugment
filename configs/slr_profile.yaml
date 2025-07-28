@@ -70,7 +70,7 @@ plan:
       semantic_check: "preserve_handshape_class"
 
   - operation: "PoseFlipping"
-    probability: 0.5
+    probability: 1.0
     # Flips pose and swaps left/right landmark labels.
     # Powerful for balancing datasets with dominant-hand bias.
     # No extra parameters needed.
