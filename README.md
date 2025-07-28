@@ -1,7 +1,7 @@
 # KineticAugment: A Geometry-Aware Augmentation Framework for Human Motion
 
 <p align="center">
-  <img src="docs/media/your_logo_or_banner.png" alt="KineticAugment Banner" width="70%">
+  <img src="docs/media/banner.png" alt="KineticAugment Banner" width="70%">
 </p>
 
 **KineticAugment** is a framework for augmenting human motion data while preserving anatomical and semantic plausibility. It's designed for researchers and engineers working on Sign Language Recognition, Human Activity Recognition, and other motion analysis tasks who need to increase dataset size without introducing unrealistic or label-altering artifacts.
