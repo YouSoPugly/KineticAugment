@@ -9,17 +9,25 @@ def to_canonical_space_frame(frame_landmarks: np.ndarray) -> tuple[np.ndarray, d
     Converts a single frame of landmarks to a canonical representation and returns
     the parameters needed to reverse the transformation.
 
+    This version explicitly handles invalid landmarks (all zeros) to prevent
+    them from being transformed.
+
     Returns:
         tuple[np.ndarray, dict]: A tuple containing:
             - The canonicalized (543, 3) landmark array.
             - A dictionary of transformation parameters for inversion.
     """
+    # Create a mask to identify landmarks that were not detected (all zeros).
+    # These landmarks should not be part of any transformation.
+    invalid_mask = np.all(frame_landmarks == 0, axis=1)
+
     pose_landmarks = frame_landmarks[POSE_START:POSE_END]
     
     # --- 1. Store original translation (centering vector) ---
     translation_vector = (pose_landmarks[LEFT_SHOULDER] + pose_landmarks[RIGHT_SHOULDER]) / 2.0
+    # If the reference landmarks are not detected, we cannot process this frame.
     if np.all(translation_vector == 0):
-        return frame_landmarks, None # Cannot process this frame
+        return frame_landmarks, None
 
     centered_landmarks = frame_landmarks - translation_vector
 
@@ -38,7 +46,6 @@ def to_canonical_space_frame(frame_landmarks: np.ndarray) -> tuple[np.ndarray, d
     rotation_matrix = np.array([x_axis, y_axis, z_axis]).T
     original_rotation = Rotation.from_matrix(rotation_matrix)
     
-    # The aligning rotation is the inverse of the original rotation
     aligning_rotation = original_rotation.inv()
     oriented_landmarks = aligning_rotation.apply(centered_landmarks)
 
@@ -50,10 +57,13 @@ def to_canonical_space_frame(frame_landmarks: np.ndarray) -> tuple[np.ndarray, d
     scale_factor = 1.0 / shoulder_width
     canonical_landmarks = oriented_landmarks * scale_factor
 
-    # Store parameters needed for the inverse operation
+    # After all transformations, re-apply the invalid mask to ensure
+    # undetected landmarks remain as (0, 0, 0).
+    canonical_landmarks[invalid_mask] = 0.0
+
     transform_params = {
         'translation': translation_vector,
-        'rotation': original_rotation, # Store the original rotation, not its inverse
+        'rotation': original_rotation,
         'scale': scale_factor
     }
     
@@ -63,9 +73,14 @@ def from_canonical_space_frame(canonical_landmarks: np.ndarray, params: dict) ->
     """
     Applies the inverse transformation to a frame to convert it back
     from canonical space to its original coordinate space.
+
+    This version also preserves the status of invalid landmarks.
     """
     if params is None:
-        return canonical_landmarks # Return as-is if no params available
+        return canonical_landmarks
+
+    # Identify invalid landmarks in the canonical space before transforming.
+    invalid_mask = np.all(canonical_landmarks == 0, axis=1)
 
     # Apply inverse transformations in reverse order
     # 1. Inverse Scale
@@ -77,6 +92,10 @@ def from_canonical_space_frame(canonical_landmarks: np.ndarray, params: dict) ->
     # 3. Inverse Translation (add the original centering vector back)
     original_space_landmarks = deoriented_landmarks + params['translation']
     
+    # Re-apply the invalid mask to correct for any floating point errors
+    # that may have made zero-vectors non-zero.
+    original_space_landmarks[invalid_mask] = 0.0
+
     return original_space_landmarks
 
 def canonicalize_sequence(sequence_data: np.ndarray) -> tuple[np.ndarray, list]:
