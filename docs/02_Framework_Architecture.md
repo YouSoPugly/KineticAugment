@@ -22,8 +22,8 @@ graph TD
 
     subgraph "KineticAugment Pipeline"
         Pipeline("Augmentation Pipeline")
-        ConstraintSystem{"Layer 2: The Constraint System<br/><i>Gatekeeper & Rule Enforcer</i>"}
-        CoreEngine(["Layer 1: The Core Engine<br/><i>Performs Transformations</i>"])
+        ConstraintSystem{"Layer 2: The Constraint System - Gatekeeper & Rule Enforcer"}
+        CoreEngine(["Layer 1: The Core Engine - Performs Transformations"])
     end
 
     subgraph "Final Output"
@@ -34,10 +34,10 @@ graph TD
     TaskProfile -- "Loads configuration" --> Pipeline
     MotionData -- "Input for augmentation" --> Pipeline
 
-    Pipeline -- "1. Requests transform (e.g., rotate_joint)" --> ConstraintSystem
-    ConstraintSystem -- "2. Validates against Core Principles <br/> (e.g., checks joint limits)" --> CoreEngine
-    CoreEngine -- "3. Executes the valid, raw transformation" --> Pipeline
-    Pipeline -- "4. Loops for next op or outputs result" --> AugmentedData
+    Pipeline -- "Requests transform (e.g., rotate_joint)" --> ConstraintSystem
+    ConstraintSystem -- "Validates against Core Principles (e.g., checks joint limits)" --> CoreEngine
+    CoreEngine -- "Executes the valid, raw transformation" --> Pipeline
+    Pipeline -- "Loops for next op or outputs result" --> AugmentedData
 
 ```
 
