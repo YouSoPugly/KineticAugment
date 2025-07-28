@@ -1,0 +1,87 @@
+# ==========================================================
+# KineticAugment Task-Specific Profile
+# Application: Human Activity Recognition (HAR) - "Running"
+# ==========================================================
+#
+# Goal: Make the model robust to different running styles,
+# speeds, terrains, and body types.
+#
+# Philosophy:
+# - HIGH Priority: The core anti-phase motion of limbs.
+# - MEDIUM Priority: Torso posture, ground contact.
+# - LOW Priority: Speed (cadence), stride length, arm swing.
+#
+# ==========================================================
+
+# --- Global Settings ---
+
+# A unique name for the profile.
+profile_name: "HAR_Running_Default"
+
+# Defines the skeleton's structure for Kinematic Chain Consistency.
+kinematic_chains:
+  - ["left_shoulder", "left_elbow", "left_wrist"]
+  - ["right_shoulder", "right_elbow", "right_wrist"]
+  - ["pelvis", "left_hip", "left_knee", "left_anle"]
+  - ["pelvis", "right_hip", "right_knee", "right_anle"]
+
+# Defines anatomical joint angle limits (in radians).
+joint_limits:
+  elbow: { min: 0.0, max: 2.6 }
+  shoulder_pitch: { min: -1.57, max: 1.57 }
+  knee: { min: 0.0, max: 2.4 }
+  hip_pitch: { min: -1.0, max: 1.0 }
+
+# --- Environmental Constraints ---
+# Crucial for activities that interact with the world.
+environmental_constraints:
+  # Enforce the "Environmental Interaction" principle.
+  ground_plane:
+    enabled: True
+    # Assumes the ground is at y=0. Prevents feet from going through the floor.
+    y_coordinate: 0.0
+    # Defines which joints must respect the ground plane.
+    contact_joints: ["left_ankle", "right_ankle", "left_foot_index", "right_foot_index"]
+
+# --- Augmentation Plan ---
+# A sequence of augmentation operations to be applied.
+
+plan:
+  # --- 1. Extrinsic (Scene-Level) Augmentations ---
+  - operation: "GlobalRotation"
+    probability: 0.3
+    params:
+      pivot_point: "pelvis"
+      # Allow for more lean forward/backward (pitch) than in SLR
+      max_angle_deg: { x: 10, y: 3, z: 3 }
+
+  # --- 2. Intrinsic (Anatomy-Level) Augmentations ---
+  - operation: "JointAnglePerturbation"
+    probability: 0.8
+    params:
+      # Apply aggressive noise to almost all joints, as running styles vary widely.
+      joint_group: "all"
+      noise_stddev_rad: 0.15 # Much higher than SLR profile
+
+  - operation: "LimbLengthScaling"
+    probability: 0.6
+    params:
+      # Simulate different body proportions, which directly affects stride length.
+      joint_group: "legs"
+      scale_range: [0.9, 1.1] # Allow for +/- 10% variation
+
+  # --- 3. Temporal Augmentations ---
+  - operation: "RateAlteration"
+    probability: 0.9
+    params:
+      # Aggressively augment the speed (cadence) of the run.
+      # This is a LOW priority feature for this task.
+      rate_range: [0.75, 1.4] # 25% slower to 40% faster
+
+  - operation: "DynamicTrajectoryJittering"
+    probability: 0.5
+    params:
+      # Add noise to torso path to simulate running on uneven terrain.
+      joint_group: "pelvis"
+      amplitude: 0.05 # Max deviation in meters
+      frequency: 0.2
