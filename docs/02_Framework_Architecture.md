@@ -14,7 +14,7 @@ The architecture consists of three main layers:
 The following diagram illustrates how data flows through the framework. A user provides the motion data and a Task Profile, and the pipeline processes it through the layers to produce a valid, augmented sample.
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontSize': '15px', 'fontFamily': 'Inter'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'fontSize': '15px'}}}%%
 graph TD
     subgraph "User Input & Control"
         TaskProfile["Task-Specific Profile (.yaml)"]
