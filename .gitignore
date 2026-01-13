@@ -218,6 +218,7 @@ CLAUDE.md
 
 models/smplx/*.npz
 models/smplx/*.pkl
+models/smplx/*.zip
 
 models/mano/*.pkl
 models/vposer/*.pt
