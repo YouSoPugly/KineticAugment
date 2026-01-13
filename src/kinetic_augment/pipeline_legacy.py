@@ -1,5 +1,26 @@
-# --- START OF FILE src/kinetic_augment/pipeline.py ---
+"""
+Legacy Augmentation Pipeline (DEPRECATED).
 
+This module is deprecated. Please use the new Pipeline class instead:
+
+    # Old way (deprecated)
+    from kinetic_augment import AugmentationPipeline
+    pipeline = AugmentationPipeline("config.yaml")
+
+    # New way (recommended)
+    from kinetic_augment import Pipeline
+    pipeline = Pipeline.from_yaml("config.yaml")
+    # or
+    pipeline = Pipeline.from_preset("moderate")
+
+The new Pipeline class provides:
+- Built-in presets (conservative, moderate, aggressive)
+- PyTorch Dataset integration
+- Configurable constraint enforcement
+- Better reproducibility with seed support
+"""
+
+import warnings
 import yaml
 import numpy as np
 from pathlib import Path
@@ -7,18 +28,32 @@ from pathlib import Path
 from . import canonicalization
 from . import augmentations
 
+
 class AugmentationPipeline:
+    """
+    DEPRECATED: Use `kinetic_augment.Pipeline` instead.
+
+    Legacy augmentation pipeline for backwards compatibility.
+    """
+
     def __init__(self, profile_path: Path):
+        warnings.warn(
+            "AugmentationPipeline is deprecated. Use Pipeline.from_yaml() instead:\n"
+            "  from kinetic_augment import Pipeline\n"
+            "  pipeline = Pipeline.from_yaml('config.yaml')",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         try:
             with open(profile_path, 'r') as f:
                 self.profile = yaml.safe_load(f)
-            print(f"✅ Augmentation profile '{self.profile.get('profile_name', 'N/A')}' loaded successfully.")
+            print(f"Augmentation profile '{self.profile.get('profile_name', 'N/A')}' loaded successfully.")
         except Exception as e:
             print(f"Error loading profile from {profile_path}: {e}")
             raise
 
         # Map operation names from YAML to actual functions
-        # This map is now updated with all the new functions
         self.augmentation_map = {
             "GlobalRotation": augmentations.global_rotation,
             "GlobalScaling": augmentations.global_scaling,
@@ -44,7 +79,7 @@ class AugmentationPipeline:
         # 1. Convert to Canonical Space and store transformation params
         print("  -> Step 1: Converting to canonical space...")
         canonical_data, params_per_frame = canonicalization.canonicalize_sequence(raw_sequence_data)
-        
+
         augmented_data = canonical_data.copy()
 
         # 2. Apply Augmentation Plan
@@ -62,7 +97,7 @@ class AugmentationPipeline:
                     augmented_data = aug_func(augmented_data, **params)
                 else:
                     print(f"    - Warning: Augmentation '{operation_name}' not implemented. Skipping.")
-        
+
         # 3. Handle Output Space
         if output_space == 'original':
             print("  -> Step 3: De-canonicalizing back to original space...")

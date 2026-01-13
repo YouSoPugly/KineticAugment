@@ -1,0 +1,116 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kinetic-augment"
+version = "0.2.0"
+description = "A geometry-aware data augmentation framework for human skeletal motion data"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Vangelis", email = "vangelis@example.com"}
+]
+keywords = [
+    "data-augmentation",
+    "skeleton",
+    "motion-capture",
+    "sign-language",
+    "human-activity-recognition",
+    "pose-estimation",
+    "smplx",
+    "mediapipe"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21.0",
+    "scipy>=1.7.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.62.0",
+]
+
+[project.optional-dependencies]
+# Core SMPL-X support
+smplx = [
+    "torch>=1.10.0",
+    "smplx>=0.1.28",
+    "trimesh>=3.10.0",
+]
+# Physics simulation
+physics = [
+    "pybullet>=3.2.0",
+]
+# Pose prior (VPoser)
+pose-prior = [
+    "torch>=1.10.0",
+    "human-body-prior",
+]
+# Full installation with all features
+full = [
+    "torch>=1.10.0",
+    "smplx>=0.1.28",
+    "trimesh>=3.10.0",
+    "pybullet>=3.2.0",
+]
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "jupyter>=1.0.0",
+    "matplotlib>=3.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/imics-lab/KineticAugment"
+Documentation = "https://github.com/imics-lab/KineticAugment/tree/main/docs"
+Repository = "https://github.com/imics-lab/KineticAugment"
+Issues = "https://github.com/imics-lab/KineticAugment/issues"
+
+[project.scripts]
+kinetic-augment = "kinetic_augment.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kinetic_augment = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | build
+    | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"

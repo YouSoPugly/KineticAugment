@@ -8,6 +8,8 @@ The validation process is divided into two stages, mirroring the structure of ou
 1.  **Physical Validation:** Checks for anatomical and physical plausibility.
 2.  **Semantic Validation:** Checks for task-specific meaning and integrity.
 
+> **Implementation Note:** The validation framework is implemented in `kinetic_augment.evaluation.metrics` with comprehensive metrics for quality assessment. See the [Evaluation Metrics](#implemented-metrics) section below.
+
 ---
 
 ## Stage 1: Physical Validation
@@ -99,8 +101,72 @@ def validate_augmented_sample(original_motion, augmented_motion, profile):
     return True
 ```
 
+---
+
+## Implemented Metrics
+
+The evaluation module (`kinetic_augment.evaluation`) provides a comprehensive set of metrics for validating augmented data:
+
+### Quality Metrics
+| Metric | Description |
+|--------|-------------|
+| `LimbLengthConsistencyMetric` | Checks limb length stability across frames |
+| `PoseValidityMetric` | Validates pose is within reasonable bounds |
+| `AnatomicalPlausibilityMetric` | Composite anatomical plausibility score |
+
+### Temporal Metrics
+| Metric | Description |
+|--------|-------------|
+| `VelocityMetric` | Measures velocity statistics and violations |
+| `SmoothnessMetric` | Jerk-based smoothness analysis |
+| `TemporalCoherenceMetric` | Frame-to-frame correlation and discontinuity detection |
+| `SpectralSmoothnessMetric` | Frequency-domain smoothness analysis |
+
+### Constraint Metrics
+| Metric | Description |
+|--------|-------------|
+| `JointLimitComplianceMetric` | Percentage of frames within joint limits |
+| `ViolationSeverityMetric` | Severity of constraint violations |
+| `ConstraintSatisfactionMetric` | Overall constraint satisfaction rate |
+
+### Diversity Metrics
+| Metric | Description |
+|--------|-------------|
+| `VarianceMetric` | Data variance and spread |
+| `DistributionShiftMetric` | Distribution shift from original data |
+| `CoverageMetric` | Coverage of the pose space |
+
+### Usage Example
+
+```python
+from kinetic_augment.evaluation import MetricAggregator
+from kinetic_augment.evaluation.metrics import (
+    LimbLengthConsistencyMetric,
+    SmoothnessMetric,
+    JointLimitComplianceMetric,
+)
+
+# Create aggregator with desired metrics
+aggregator = MetricAggregator([
+    LimbLengthConsistencyMetric(),
+    SmoothnessMetric(),
+    JointLimitComplianceMetric(),
+])
+
+# Evaluate augmented samples
+results = aggregator.evaluate(augmented_samples)
+
+# Check results
+for name, result in results.items():
+    print(f"{name}: {result.value:.4f}")
+    if result.value < 0.9:  # Threshold for rejection
+        print(f"  Warning: {name} below threshold")
+```
+
+---
+
 ### Next Up: Glossary
 
 This concludes the main documentation of the framework's philosophy and structure. The final document provides definitions for key terms used throughout.
 
-➡️ **Next: [Glossary](./GLOSSARY.md)**
+**Next: [Glossary](./GLOSSARY.md)**

@@ -40,26 +40,26 @@ joint_limits:
 plan:
   # --- 1. Extrinsic (Scene-Level) Augmentations ---
   - operation: "GlobalRotation"
-    probability: 0.5
+    probability: 0.0
     params:
       pivot_point: "pelvis"
       max_angle_deg: { x: 0, y: 5, z: 2 } # Yaw up to 5deg, Roll up to 2deg
 
   - operation: "GlobalScaling"
-    probability: 0.4
+    probability: 0.0
     params:
       scale_range: [0.95, 1.05] # Simulate moving 5% closer/further
 
   # --- 2. Intrinsic (Anatomy-Level) Augmentations ---
   - operation: "JointAnglePerturbation"
-    probability: 0.7
+    probability: 0.0
     params:
       # Apply moderate noise to MEDIUM priority arm joints
       joint_group: "arms"
       noise_stddev_rad: 0.05
 
   - operation: "JointCoupledNoise"
-    probability: 0.4
+    probability: 0.0
     params:
       # Apply VERY LOW noise to HIGH priority finger joints
       joint_group: "fingers"
@@ -70,20 +70,20 @@ plan:
       semantic_check: "preserve_handshape_class"
 
   - operation: "PoseFlipping"
-    probability: 1.0
+    probability: 0.0
     # Flips pose and swaps left/right landmark labels.
     # Powerful for balancing datasets with dominant-hand bias.
     # No extra parameters needed.
 
   # --- 3. Temporal Augmentations ---
   - operation: "TimeWarping"
-    probability: 0.6
+    probability: 0.0
     params:
       # Moderate time warping to simulate variations in signing speed
       max_warp_factor: 0.15
 
   - operation: "DynamicTrajectoryJittering"
-    probability: 0.3
+    probability: 0.0
     params:
       # Add subtle, smooth noise to hand trajectories
       joint_group: "hands"

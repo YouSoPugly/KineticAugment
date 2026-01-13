@@ -2,10 +2,11 @@
 
 To effectively implement the [Core Principles](./01_Core_Principles.md), KineticAugment is designed with a modular, layered architecture. This design separates the fundamental transformation operations from the rules that govern them, making the framework flexible, extensible, and easy to configure.
 
-The architecture consists of three main layers:
+The architecture consists of four main layers:
 1.  **The Core Augmentation Engine** (The "Muscle")
 2.  **The Constraint System** (The "Brain")
 3.  **Task-Specific Profiles** (The "Blueprint")
+4.  **The Evaluation System** (The "Quality Control")
 
 ---
 
@@ -106,10 +107,36 @@ A **Task-Specific Profile** is a human-readable configuration file (e.g., in YAM
 
 This layer provides the "story" or "recipe" that uses the verbs and rules from the other layers to create a meaningful final product.
 
+### Layer 4: The Evaluation System
+
+The **Evaluation System** provides comprehensive quality assessment for augmented data. It measures how well the augmented samples maintain physical plausibility and motion quality.
+
+*   **Role:** To validate and quantify the quality of augmented motion data.
+*   **Characteristics:**
+    *   **Modular Metrics:** Pluggable metric classes for different quality aspects.
+    *   **Aggregation:** Combine multiple metrics for comprehensive assessment.
+    *   **Benchmarking:** Compare different augmentation configurations systematically.
+*   **Key Components:**
+    *   **Quality Metrics:** Limb length consistency, pose validity, anatomical plausibility.
+    *   **Temporal Metrics:** Velocity, smoothness (jerk), temporal coherence.
+    *   **Constraint Metrics:** Joint limit compliance, violation severity.
+    *   **Diversity Metrics:** Variance, distribution shift, coverage.
+
+**Example Usage:**
+```python
+from kinetic_augment.evaluation import MetricAggregator
+from kinetic_augment.evaluation.metrics import SmoothnessMetric, VarianceMetric
+
+aggregator = MetricAggregator([SmoothnessMetric(), VarianceMetric()])
+results = aggregator.evaluate(augmented_samples)
+```
+
+This layer provides the "quality assurance" that validates the output of the augmentation pipeline.
+
 ---
 
 ### Next Up: The Augmentation Catalogue
 
 Now that we understand the architecture, we can explore the comprehensive list of "verbs" available in the Core Engine.
 
-➡️ **Next: [03 - The Augmentation Catalogue](./03_Augmentation_Catalogue.md)**
+**Next: [03 - The Augmentation Catalogue](./03_Augmentation_Catalogue.md)**

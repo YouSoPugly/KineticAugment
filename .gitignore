@@ -205,3 +205,19 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Claude
+.claude_config/
+.claude_context/
+.claude_index/
+.claude_cache/
+.claudeignore
+CLAUDE.md
+
+.fuse_hidden*
+
+models/smplx/*.npz
+models/smplx/*.pkl
+
+models/mano/*.pkl
+models/vposer/*.pt

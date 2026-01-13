@@ -1,0 +1,10 @@
+# Model files (too large for git, must be downloaded separately)
+*.npz
+*.pkl
+*.pt
+*.pth
+*.onnx
+*.h5
+
+# Keep the directory structure
+!.gitignore

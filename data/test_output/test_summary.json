@@ -1,0 +1,30 @@
+{
+  "joint_mapping": "passed",
+  "videos": [
+    {
+      "video": "01986.mp4",
+      "frames": 83
+    },
+    {
+      "video": "01987.mp4",
+      "frames": 75
+    },
+    {
+      "video": "01988.mp4",
+      "frames": 144
+    },
+    {
+      "video": "01991.mp4",
+      "frames": 49
+    },
+    {
+      "video": "01992.mp4",
+      "frames": 59
+    }
+  ],
+  "conversion": {
+    "simple_fitter": "passed",
+    "smplx_available": true,
+    "round_trip_error": 0.5973516702651978
+  }
+}
