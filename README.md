@@ -198,10 +198,10 @@ This project is licensed under the [MIT License](./LICENSE).
 If you use KineticAugment in your research, please cite:
 
 ```bibtex
-@software{kineticaugment2024,
+@software{kineticaugment2026,
   title = {KineticAugment: A Geometry-Aware Augmentation Framework for Human Motion},
-  author = {Vangelis},
-  year = {2024},
-  url = {https://github.com/yourusername/KineticAugment}
+  author = {Vangelis Metsis},
+  year = {2026},
+  url = {https://github.com/imics-lab/KineticAugment}
 }
 ```
