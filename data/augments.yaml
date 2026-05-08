@@ -1,0 +1,66 @@
+pipelines:
+  - name: baseline
+    seed: 1
+    augmentations: []
+
+  - name: test_global_rotation
+    seed: 11
+    augmentations:
+      - name: global_rotation
+        params:
+          max_angle_deg:
+            x: 10
+            y: 10
+            z: 10
+
+  - name: test_global_scaling
+    seed: 12
+    augmentations:
+      - name: global_scaling
+        params:
+          scale_range: [0.9, 1.1]
+
+  - name: test_pose_flipping
+    seed: 13
+    augmentations:
+      - name: pose_flipping
+        params: {}
+
+  - name: test_time_warping
+    seed: 14
+    augmentations:
+      - name: time_warping
+        params:
+          max_warp_factor: 0.08
+          num_knots: 5
+
+  - name: test_trajectory_jitter
+    seed: 15
+    augmentations:
+      - name: trajectory_jitter
+        params:
+          amplitude: 0.01
+          frequency: 1.0
+          num_waves: 3
+
+  - name: test_combo_all_real
+    seed: 21
+    augmentations:
+      - name: global_rotation
+        params:
+          max_angle_deg:
+            x: 8
+            y: 8
+            z: 8
+      - name: global_scaling
+        params:
+          scale_range: [0.95, 1.05]
+      - name: time_warping
+        params:
+          max_warp_factor: 0.05
+          num_knots: 5
+      - name: trajectory_jitter
+        params:
+          amplitude: 0.008
+          frequency: 0.8
+          num_waves: 3

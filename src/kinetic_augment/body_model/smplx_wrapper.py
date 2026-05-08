@@ -70,7 +70,7 @@ class SMPLXWrapper:
         gender: str = "neutral",
         num_betas: int = 10,
         num_expression_coeffs: int = 10,
-        use_pca: bool = True,
+        use_pca: bool = False,
         num_pca_comps: int = 12,
         use_face_contour: bool = False,
         batch_size: int = 1,
