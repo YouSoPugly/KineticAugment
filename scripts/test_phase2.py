@@ -18,6 +18,8 @@ import os
 import sys
 from pathlib import Path
 
+from kinetic_augment.body_model.mp_to_smplx import MediaPipeToSMPLX
+
 # Set up headless environment
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
@@ -478,10 +480,10 @@ def test_end_to_end():
     # Test 2: Fit SMPL-X and apply intrinsic augmentations
     tests_total += 1
     try:
-        from kinetic_augment.body_model.mp_to_smplx import SimpleFitter
+        import kinetic_augment.body_model.mp_to_smplx
         from kinetic_augment.augmentations.intrinsic import JointAnglePerturbation
 
-        fitter = SimpleFitter()
+        fitter = MediaPipeToSMPLX()
         first_frame = landmarks[0]
         smplx_params = fitter.fit(first_frame)
 

@@ -302,42 +302,12 @@ def test_body_model_conversion(landmarks: np.ndarray) -> dict:
         'round_trip_error': None,
     }
 
-    # Test SimpleFitter (doesn't require SMPL-X)
-    print("\n1. Testing SimpleFitter (no SMPL-X required)...")
-    try:
-        from kinetic_augment.body_model.mp_to_smplx import SimpleFitter
-
-        fitter = SimpleFitter()
-
-        # Use first valid frame
-        test_frame = landmarks[0]
-
-        params = fitter.fit(test_frame)
-
-        print(f"   ✓ SimpleFitter produced valid output")
-        print(f"     - body_pose shape: {params['body_pose'].shape}")
-        print(f"     - global_orient shape: {params['global_orient'].shape}")
-
-        # Check that angles are reasonable
-        body_pose = params['body_pose'][0]
-        max_angle = np.abs(body_pose).max()
-        print(f"     - max body pose angle: {np.degrees(max_angle):.1f}°")
-
-        results['simple_fitter'] = 'passed'
-
-    except Exception as e:
-        print(f"   ✗ SimpleFitter failed: {e}")
-        results['simple_fitter'] = f'failed: {e}'
-
     # Test SMPLXWrapper (requires models)
     print("\n2. Testing SMPL-X integration...")
     # Note: smplx.create() expects the parent directory containing 'smplx/' folder
     model_path = Path(__file__).parent.parent / 'models'
     smplx_model_dir = model_path / 'smplx'
 
-    if not TORCH_AVAILABLE:
-        print("   ⊘ PyTorch not available - skipping SMPL-X tests")
-        return results
 
     if not smplx_model_dir.exists():
         print(f"   ⊘ SMPL-X models not found at {smplx_model_dir}")
@@ -350,13 +320,17 @@ def test_body_model_conversion(landmarks: np.ndarray) -> dict:
         from kinetic_augment.body_model.smplx_to_mp import SMPLXToMediaPipe
 
         print("   Loading SMPL-X model...")
-        wrapper = SMPLXWrapper(model_path=model_path, gender='neutral')
+        wrapper = SMPLXWrapper(
+            model_path=Path(__file__).parent.parent / "models",
+            gender="neutral",
+            use_pca=False,
+        )
         print(f"   ✓ SMPL-X model loaded ({wrapper.device})")
         results['smplx_available'] = True
 
         # Test fitting
         print("\n   Testing MediaPipe → SMPL-X fitting...")
-        fitter = MediaPipeToSMPLX(wrapper, num_iterations=50, verbose=False)
+        fitter = MediaPipeToSMPLX()
 
         test_frame = landmarks[0]
         smplx_params = fitter.fit(test_frame)
