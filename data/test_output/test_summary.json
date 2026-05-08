@@ -21,7 +21,7 @@
         "-2.1211443",
         "0.910607"
       ],
-      "processing_time": 3.5639991760253906
+      "processing_time": 3.6399993896484375
     },
     {
       "video": "01987.mp4",
@@ -43,7 +43,7 @@
         "-1.0081618",
         "0.47724906"
       ],
-      "processing_time": 3.2934985160827637
+      "processing_time": 3.270998954772949
     },
     {
       "video": "01988.mp4",
@@ -65,7 +65,7 @@
         "-1.6396654",
         "0.72312367"
       ],
-      "processing_time": 5.973499059677124
+      "processing_time": 5.997998476028442
     },
     {
       "video": "01991.mp4",
@@ -87,7 +87,7 @@
         "-1.4488304",
         "0.79989296"
       ],
-      "processing_time": 2.036499500274658
+      "processing_time": 2.121500015258789
     },
     {
       "video": "01992.mp4",
@@ -109,34 +109,12 @@
         "-1.7441796",
         "0.80549765"
       ],
-      "processing_time": 2.4235005378723145
-    },
-    {
-      "video": "KnockKnock.mp4",
-      "frames": 8364,
-      "fps": 29.897,
-      "detection_rate": 100.0,
-      "valid_frames": 8364,
-      "left_hand_frames": 5134,
-      "right_hand_frames": 7429,
-      "x_range": [
-        "-0.25880006",
-        "1.1863779"
-      ],
-      "y_range": [
-        "-0.0034533655",
-        "3.359627"
-      ],
-      "z_range": [
-        "-2.4228914",
-        "1.5911678"
-      ],
-      "processing_time": 358.57699823379517
+      "processing_time": 2.4100019931793213
     }
   ],
   "conversion": {
-    "simple_fitter": "passed",
+    "simple_fitter": null,
     "smplx_available": true,
-    "round_trip_error": 0.5973515510559082
+    "round_trip_error": null
   }
 }
